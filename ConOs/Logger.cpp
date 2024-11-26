@@ -1,48 +1,71 @@
 #include "Define.h"
 #include "Logger.h"
 
-Parent::Parent(Logger* l) {
+string EnumToStr(LoggerMessageLevel level) {
+	switch (level)
+	{
+	case DEBUG:
+		return "DEBUG";
+	case INFO:
+		return "INFO";
+	case WARN:
+		return "WARN";
+	case ERR:
+		return "ERROR";
+	case FATAL:
+		return "FATAL";
+	case STARTED:
+		return "START-INFO";
+	case STOPPED:
+		return "STOP-INFO";
+	default:
+		return "UNKNOWN";
+	}
+}
+
+Parent::Parent(Logger* l, string name) {
+	this->name = name;
 	this->logger = l;
 	this->work = true;
-	this->logger->SendSignal(this, STARTED, "[" + name + "] Starting...");
+	this->logger->SendSignal(this, STARTED, "Starting...");
 	this->functhread = new thread(&Parent::Main, this);
 	this->functhread->detach();
 }
 void Parent::Exit() {
 	this->work = false;
-	this->logger->SendSignal(this, STOPPED, "[" + name + "] Stopped!");
+	this->logger->SendSignal(this, STOPPED, "Stopped!");
 }
 
-Logger::Logger(ostream * stream) {
-	this->strm = stream;
-	this->work = true;
-}
 void Logger::LoggerWorker()
 {
-	if (!this->work) { if (this->strm->good()) { this->strm->operator<<("[DEBUG] Logger isn't inited!"); } }
+	if (!this->work) { if (cout.good()) { cout << "[DEBUG] [Logger-Worker] Logger isn't inited!"; } }
 	while (this->work) {
-		for (poolIter iter = this->pool.end(); iter != this->pool.begin(); iter--) {
-			this->strm->operator<<((*iter).c_str());
+		this->started = true;
+		for (poolIter iter = this->pool.begin(); iter != this->pool.end(); iter++) {
+			cout << (*iter + "\n").c_str();
 		}
+		this->pool.clear();
 		this_thread::sleep_for(chrono::milliseconds(10));
+		if (this->stop) { this->work = false; }
+		if (this->started && this->threads.empty()) { this->stop = true; }
 	}
-	this->strm->operator<<("[DEBUG] Logger is stopped!");
+	cout << "[DEBUG] [Logger-Worker] Logger is stopped!";
 }
 Logger::threadsIter Logger::FindThread(Parent* elem) {
 	for (Logger::threadsIter iter = this->threads.begin(); iter != this->threads.end(); iter++) { if (*iter == elem) { return iter; } }
 }
 void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) {
-	string formatted;
+	this->pool.push_back("[" + EnumToStr(level) + "] [" + elem->getName() + "] " + message);
 	if (level == STARTED) {
 		this->threads.push_back(elem);
 	}
 	if (level == STOPPED) {
-		this->threads.erase(FindThread(elem), FindThread(elem));
+		this->threads.erase(this->FindThread(elem));
 	}
 	if (level == FATAL) {
 		for (auto& thrd : this->threads) {
 			thrd->Exit();
 		}
-		this->work = false;
 	}
+	
 }

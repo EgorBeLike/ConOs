@@ -4,9 +4,10 @@
 
 int main()
 {
-    Logger* logger = new Logger(&cout);
+    cout << string(NAME) + " v1.0\n";
+    Logger* logger = new Logger();
     Window* window = new Window(logger);
 
     thread* lthread = new thread(&Logger::LoggerWorker, logger);
-    lthread->detach();
+    lthread->join();
 }

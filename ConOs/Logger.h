@@ -5,11 +5,13 @@ enum LoggerMessageLevel {
 	DEBUG = -1,
 	INFO,
 	WARN,
-	ERROR,
+	ERR,
 	FATAL,
 	STARTED,
 	STOPPED
 };
+
+string EnumToStr(LoggerMessageLevel);
 
 class Logger;
 
@@ -20,19 +22,21 @@ public:
 	thread* functhread;
 	string name = "Worker";
 	virtual void Main() {}
-	Parent(Logger* l);
+	Parent(Logger*, string name = "Worker");
+	constexpr inline string getName() { return name; }
 	void Exit();
 };
 
 class Logger {
 public:
-	ostream* strm;
 	vector<string> pool;
 	vector<Parent*> threads;
 	using threadsIter = vector<Parent*>::iterator;
 	using poolIter = vector<string>::iterator;
 	bool work;
-	Logger(ostream*);
+	bool started;
+	bool stop;
+	Logger() : work(true), started(false), stop(false) {}
 	void LoggerWorker();
 	threadsIter FindThread(Parent*);
 	void SendSignal(Parent*, LoggerMessageLevel, string);
