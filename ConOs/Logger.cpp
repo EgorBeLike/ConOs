@@ -38,8 +38,10 @@ void Parent::Exit() {
 
 void Logger::LoggerWorker()
 {
-	if (!this->work) { if (cout.good()) { cout << "[DEBUG] [Logger-Worker] Logger isn't inited!"; } }
+	if (!this->work) { if (cout.good()) { cout << "[DEBUG] [Logger-Worker] Logger isn't inited!\n"; } return; }
+	cout << "[DEBUG] [Logger-Worker] Logger is inited!\n";
 	while (this->work) {
+		if (this->debug) { cout << to_string(this->threads.size()) + " " + to_string(this->pool.size()) + "\n"; }
 		this->started = true;
 		for (poolIter iter = this->pool.begin(); iter != this->pool.end(); iter++) {
 			cout << (*iter + "\n").c_str();

@@ -13,6 +13,20 @@
 #include <vector>
 #include <string.h>
 #include <Windows.h>
+#include <fstream>
+
+#ifdef __cpp_lib_experimental_filesystem
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem::v1;
+#elif __cpp_lib_filesystem
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#error "no filesystem support ='("
+#endif
+
+#pragma warning(disable : 4996)
 
 #pragma comment(lib, "sfml-audio.lib")
 #pragma comment(lib, "sfml-graphics.lib")

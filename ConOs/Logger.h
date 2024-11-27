@@ -25,6 +25,8 @@ public:
 	Parent(Logger*, string name = "Worker");
 	constexpr inline string getName() { return name; }
 	void Exit();
+	virtual void Destroy() {}
+	virtual ~Parent() {}
 };
 
 class Logger {
@@ -36,7 +38,8 @@ public:
 	bool work;
 	bool started;
 	bool stop;
-	Logger() : work(true), started(false), stop(false) {}
+	bool debug;
+	Logger(bool isDebug = false) : work(true), started(false), stop(false), debug(isDebug) {}
 	void LoggerWorker();
 	threadsIter FindThread(Parent*);
 	void SendSignal(Parent*, LoggerMessageLevel, string);

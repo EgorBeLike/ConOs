@@ -140,7 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h" />
+    <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="OS.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
