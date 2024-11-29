@@ -23,20 +23,23 @@ class Window : public Parent {
 public:
     KeyBoardMouse kbm{};
     unsigned int x = 800, y = 600;
+    vector<sf::Drawable*> pool;
+    sf::RenderWindow* window;
+    using poolIter = vector<sf::Drawable*>::iterator;
     Window(Logger* l, string name = "Window-Worker") : Parent(l, name) {}
     void Main() override {
-        sf::RenderWindow window(sf::VideoMode(x, y), NAME, sf::Style::Close | sf::Style::Titlebar);
-        if (window.isOpen()) {
+        window = new sf::RenderWindow{ sf::VideoMode(x, y), NAME, sf::Style::Close | sf::Style::Titlebar };
+        if (window->isOpen()) {
             logger->SendSignal(this, INFO, "Window is created!");
         }
         else {
             logger->SendSignal(this, FATAL, "Window isn't created!");
         }
         
-        while (window.isOpen())
+        while (window->isOpen() && work)
         {
             sf::Event event;
-            while (window.pollEvent(event))
+            while (window->pollEvent(event))
             {
                 kbm.key = event.key;
                 kbm.touch = event.touch;
@@ -53,18 +56,62 @@ public:
                 kbm.type = event.type;
                 if (kbm.type == sf::Event::Closed)
                 {
-                    window.close();
+                    Destroy();
                     logger->SendSignal(this, FATAL, "Window is closed!");
                 }
-                
             }
-            window.clear();
-            window.display();
+            for (auto& sp : pool) {
+                window->draw(*sp);
+            }
+            window->clear();
+            window->display();
         }
+
+        Destroy();
 
         Exit();
     }
-    void Draw() {
+    
+    poolIter SendDrawable(sf::Drawable* sp) {
+        pool.push_back(sp);
+        return pool.end();
+    }
+
+    size_t SendDrawablePos(sf::Drawable* sp) {
+        pool.push_back(sp);
+        return pool.size() - 1;
+    }
+
+    void RemoveBeginDrawable() {
+        pool.erase(pool.begin());
+    }
+
+    void RemoveEndDrawable() {
+        pool.erase(pool.end());
+    }
+
+    void RemoveDrawable(poolIter& iter) {
+        pool.erase(iter);
+    }
+
+    void RemoveDrawable(size_t pos) {
+        if (pos >= pool.size()) { logger->SendSignal(this, ERR, "RemoveDrawable: Position is invalid!"); }
+        size_t i = 0;
+        for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
+            if (i == pos) {
+                pool.erase(iter);
+                return;
+            }
+            i++;
+        }
+    }
+
+    void Destroy() override {
+        window->close();
+    }
+
+    ~Window() override {
+        Destroy();
     }
 };
 

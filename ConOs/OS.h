@@ -27,6 +27,7 @@ public:
             return;
         }
         logoImage.loadFromFile(logoPath.string());
+        logoImage.saveToFile(fsystem->getABSPath("cache\\logo.png"));
         sf::Texture logoTexture{};
         logoTexture.loadFromImage(logoImage, sf::IntRect{ sf::Vector2i(window->x - 32, window->y - 16), sf::Vector2i(64, 32) });
         sf::Sprite logoSprite{ logoTexture };
@@ -37,7 +38,9 @@ public:
             logger->SendSignal(fsystem, ERR, fsystem->fspath + " not found! Set OS status: CONFIG");
             sf::Font font{};
             font.loadFromFile(fsystem->getABSPath("data\\fonts\\config.ttf"));
+            font.getTexture(32).copyToImage().saveToFile(fsystem->getABSPath("cache\\config.ttf.png"));
             sf::Text title{ "ConOS CONFIG MENU", font};
+            title.setCharacterSize(32);
             title.setPosition(sf::Vector2f(20, 20));
             window->SendDrawablePos(&title);
         }
