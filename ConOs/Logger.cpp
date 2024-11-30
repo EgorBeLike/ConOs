@@ -53,21 +53,24 @@ void Logger::LoggerWorker()
 	}
 	cout << "[DEBUG] [Logger-Worker] Logger is stopped!";
 }
-Logger::threadsIter Logger::FindThread(Parent* elem) {
-	for (Logger::threadsIter iter = this->threads.begin(); iter != this->threads.end(); iter++) { if (*iter == elem) { return iter; } }
+void Logger::RemoveThread(Parent* elem) {
+	for (auto iter = this->threads.begin(); iter != this->threads.end(); iter++) {
+		if (*iter == elem) {
+			this->threads.erase(iter); 
+		} 
+	}
 }
 void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) {
 	this->pool.push_back("[" + EnumToStr(level) + "] [" + elem->getName() + "] " + message);
 	if (level == STARTED) {
 		this->threads.push_back(elem);
 	}
-	if (level == STOPPED) {
-		this->threads.erase(this->FindThread(elem));
+	else if (level == STOPPED) {
+		RemoveThread(elem);
 	}
-	if (level == FATAL) {
+	else if (level == FATAL) {
 		for (auto& thrd : this->threads) {
 			thrd->Exit();
 		}
 	}
-	
 }

@@ -17,33 +17,48 @@ public:
     OSStatus stat;
     Window* window;
     FileSystem* fsystem;
-    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(STARTED), window(w), fsystem(f) {}
+    Config config;
+
+    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(STARTED), window(w), fsystem(f) { fsystem->config = &config; }
+
+    bool isConfigLoaded(){}
 
     void Main() override {
         sf::Image logoImage{};
-        fs::path logoPath = fsystem->getABSPath("data\\images\\logo.png");
-        if (!fs::exists(logoPath)) {
-            logger->SendSignal(fsystem, FATAL, logoPath.string() + " not found!");
-            return;
-        }
+
+        fs::path logoPath = getABSPath("data\\images\\logo.png");
+
+        if (!fs::exists(logoPath)) { logger->SendSignal(fsystem, ERR, logoPath.string() + " not found!"); }
+
         logoImage.loadFromFile(logoPath.string());
-        logoImage.saveToFile(fsystem->getABSPath("cache\\logo.png"));
+        logoImage.saveToFile(getABSPath("cache\\logo.png"));
+
         sf::Texture logoTexture{};
-        logoTexture.loadFromImage(logoImage, sf::IntRect{ sf::Vector2i(window->x - 32, window->y - 16), sf::Vector2i(64, 32) });
-        sf::Sprite logoSprite{ logoTexture };
-        size_t logoPoolIter = window->SendDrawablePos(&logoSprite);
+        logoTexture.loadFromImage(logoImage);
+
+        sf::Sprite logoSprite{};
+        logoSprite.setTexture(logoTexture);
+        logoSprite.setTextureRect(sf::IntRect{ sf::Vector2i(0,0), sf::Vector2i(64, 32) });
+        logoSprite.setScale(sf::Vector2f(2, 2));
+        logoSprite.setPosition(sf::Vector2f(window->x / 2 - 32*2, window->y / 2 - 16*2 - 50));
+
+        size_t logoPoolIter = window->SendDrawablePos(this, &logoSprite);
         this_thread::sleep_for(chrono::milliseconds(3000));
         window->RemoveDrawable(logoPoolIter);
-        if (!fs::exists(fsystem->fspath)) {
-            logger->SendSignal(fsystem, ERR, fsystem->fspath + " not found! Set OS status: CONFIG");
+
+        if (!fs::exists(config.loadOSPath)) {
+            logger->SendSignal(fsystem, ERR, config.loadOSPath + " not found! Set OS status: CONFIG");
             sf::Font font{};
-            font.loadFromFile(fsystem->getABSPath("data\\fonts\\config.ttf"));
-            font.getTexture(32).copyToImage().saveToFile(fsystem->getABSPath("cache\\config.ttf.png"));
+            font.loadFromFile(getABSPath("data\\fonts\\config.ttf"));
+            font.getTexture(32).copyToImage().saveToFile(getABSPath("cache\\config.ttf.png"));
             sf::Text title{ "ConOS CONFIG MENU", font};
             title.setCharacterSize(32);
             title.setPosition(sf::Vector2f(20, 20));
-            window->SendDrawablePos(&title);
+            size_t titleIter = window->SendDrawablePos(this, &title);
+            this_thread::sleep_for(chrono::milliseconds(3000));
         }
+        window->Cleanup(this);
+        logger->SendSignal(this, FATAL, "OS is closed! This signal sended for stopping all threads!");
         Exit();
     }
 };

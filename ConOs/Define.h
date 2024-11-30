@@ -14,6 +14,7 @@
 #include <string.h>
 #include <Windows.h>
 #include <fstream>
+#include <map>
 
 #ifdef __cpp_lib_experimental_filesystem
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING

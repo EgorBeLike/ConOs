@@ -23,10 +23,14 @@ class Window : public Parent {
 public:
     KeyBoardMouse kbm{};
     unsigned int x = 800, y = 600;
-    vector<sf::Drawable*> pool;
+
+    map<Parent*, sf::Drawable*> pool;
+    using poolIter = map<Parent*, sf::Drawable*>::iterator;
+
     sf::RenderWindow* window;
-    using poolIter = vector<sf::Drawable*>::iterator;
+
     Window(Logger* l, string name = "Window-Worker") : Parent(l, name) {}
+
     void Main() override {
         window = new sf::RenderWindow{ sf::VideoMode(x, y), NAME, sf::Style::Close | sf::Style::Titlebar };
         if (window->isOpen()) {
@@ -38,6 +42,7 @@ public:
         
         while (window->isOpen() && work)
         {
+            
             sf::Event event;
             while (window->pollEvent(event))
             {
@@ -60,10 +65,10 @@ public:
                     logger->SendSignal(this, FATAL, "Window is closed!");
                 }
             }
-            for (auto& sp : pool) {
-                window->draw(*sp);
-            }
             window->clear();
+            for (auto& sp : pool) {
+                window->draw(*sp.second);
+            }
             window->display();
         }
 
@@ -72,13 +77,14 @@ public:
         Exit();
     }
     
-    poolIter SendDrawable(sf::Drawable* sp) {
-        pool.push_back(sp);
-        return pool.end();
+    poolIter* SendDrawable(Parent* elem, sf::Drawable* sp) {
+        pool.insert(pair(elem, sp));
+        poolIter iter = pool.end();
+        return &iter;
     }
 
-    size_t SendDrawablePos(sf::Drawable* sp) {
-        pool.push_back(sp);
+    size_t SendDrawablePos(Parent* elem, sf::Drawable* sp) {
+        pool.insert(pair(elem, sp));
         return pool.size() - 1;
     }
 
@@ -90,8 +96,8 @@ public:
         pool.erase(pool.end());
     }
 
-    void RemoveDrawable(poolIter& iter) {
-        pool.erase(iter);
+    void RemoveDrawable(poolIter* iter) {
+        pool.erase(*iter);
     }
 
     void RemoveDrawable(size_t pos) {
@@ -103,6 +109,14 @@ public:
                 return;
             }
             i++;
+        }
+    }
+
+    void Cleanup(Parent* elem) {
+        for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
+            if ((*iter).first == elem) {
+                pool.erase(iter);
+            }
         }
     }
 

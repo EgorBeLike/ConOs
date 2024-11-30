@@ -41,6 +41,6 @@ public:
 	bool debug;
 	Logger(bool isDebug = false) : work(true), started(false), stop(false), debug(isDebug) {}
 	void LoggerWorker();
-	threadsIter FindThread(Parent*);
+	void RemoveThread(Parent*);
 	void SendSignal(Parent*, LoggerMessageLevel, string);
 };

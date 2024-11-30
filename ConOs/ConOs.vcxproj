@@ -132,10 +132,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConOs.cpp">
-      <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Logger.cpp">
-      <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent>false</DeploymentContent>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
