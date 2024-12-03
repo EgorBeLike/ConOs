@@ -16,6 +16,14 @@
 #include <fstream>
 #include <map>
 
+#define USE_ASSERT true
+
+#if defined(NDEBUG) && (USE_ASSERT == true)
+#undef NDEBUG
+#endif
+
+#include <cassert>
+
 #ifdef __cpp_lib_experimental_filesystem
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>

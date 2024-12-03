@@ -13,6 +13,10 @@ void FileSystem::CreateNewFS() {
 void FileSystem::Main() {
     this->logger->SendSignal(this, INFO, "Waiting for load config...");
     while (!this->config->isLoaded) {
+        if (!this->work) {
+            Exit();
+            return;
+        }
         this_thread::sleep_for(chrono::milliseconds(10));
     }
     this->logger->SendSignal(this, INFO, "Config founded!");

@@ -66,8 +66,8 @@ public:
                 }
             }
             window->clear();
-            for (auto& sp : pool) {
-                window->draw(*sp.second);
+            for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
+                window->draw(*(*iter).second);
             }
             window->display();
         }

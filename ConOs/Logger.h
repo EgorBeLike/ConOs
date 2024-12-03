@@ -38,9 +38,9 @@ public:
 	bool work;
 	bool started;
 	bool stop;
-	bool debug;
-	Logger(bool isDebug = false) : work(true), started(false), stop(false), debug(isDebug) {}
+	Logger(bool isDebug = false) : work(true), started(false), stop(false) {}
 	void LoggerWorker();
 	void RemoveThread(Parent*);
 	void SendSignal(Parent*, LoggerMessageLevel, string);
+	void SendSignal(string, LoggerMessageLevel, string);
 };

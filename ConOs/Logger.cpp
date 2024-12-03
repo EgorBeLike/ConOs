@@ -1,6 +1,8 @@
 #include "Define.h"
 #include "Logger.h"
 
+
+
 string EnumToStr(LoggerMessageLevel level) {
 	switch (level)
 	{
@@ -41,7 +43,7 @@ void Logger::LoggerWorker()
 	if (!this->work) { if (cout.good()) { cout << "[DEBUG] [Logger-Worker] Logger isn't inited!\n"; } return; }
 	cout << "[DEBUG] [Logger-Worker] Logger is inited!\n";
 	while (this->work) {
-		if (this->debug) { cout << to_string(this->threads.size()) + " " + to_string(this->pool.size()) + "\n"; }
+		//if (USE_ASSERT) { cout << to_string(this->threads.size()) + " " + to_string(this->pool.size()) + "\n"; }
 		this->started = true;
 		for (poolIter iter = this->pool.begin(); iter != this->pool.end(); iter++) {
 			cout << (*iter + "\n").c_str();
@@ -54,10 +56,31 @@ void Logger::LoggerWorker()
 	cout << "[DEBUG] [Logger-Worker] Logger is stopped!";
 }
 void Logger::RemoveThread(Parent* elem) {
-	for (auto iter = this->threads.begin(); iter != this->threads.end(); iter++) {
-		if (*iter == elem) {
-			this->threads.erase(iter); 
-		} 
+	size_t tc = this->threads.size();
+	bool done = false;
+	while (!done) {
+		tc = this->threads.size();
+		for (auto iter = this->threads.begin(); iter != this->threads.end(); iter++) {
+			if (tc != this->threads.size()) { break; }
+			if (*iter == elem) {
+				this->threads.erase(iter);
+				done = true;
+			}
+			else {
+				iter++;
+			}
+		}
+	}
+}
+void Logger::SendSignal(string name, LoggerMessageLevel level, string message) {
+	this->pool.push_back("[" + EnumToStr(level) + "] [" + name + "] " + message);
+	if (level == STARTED || level == STOPPED) {
+		throw exception((EnumToStr(level) + " not supported").c_str());
+	}
+	if (level == FATAL) {
+		for (auto& thrd : this->threads) {
+			thrd->work = false;
+		}
 	}
 }
 void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) {
@@ -70,7 +93,7 @@ void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) 
 	}
 	else if (level == FATAL) {
 		for (auto& thrd : this->threads) {
-			thrd->Exit();
+			thrd->work = false;
 		}
 	}
 }
