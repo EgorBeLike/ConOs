@@ -22,7 +22,7 @@ public:
 	thread* functhread;
 	string name = "Worker";
 	virtual void Main() {}
-	Parent(Logger*, string name = "Worker");
+	Parent(Logger*, string = "Worker");
 	constexpr inline string getName() { return name; }
 	void Exit();
 	virtual void Destroy() {}

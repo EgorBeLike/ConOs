@@ -1,6 +1,7 @@
 #pragma once
 #include "Define.h"
 #include "Logger.h"
+#include "Drawable.h"
 
 struct KeyBoardMouse {
     sf::Event::KeyEvent key;
@@ -24,12 +25,12 @@ public:
     KeyBoardMouse kbm{};
     unsigned int x = 800, y = 600;
 
-    map<Parent*, sf::Drawable*> pool;
-    using poolIter = map<Parent*, sf::Drawable*>::iterator;
+    DrawableSorter pool;
+    using poolIter = DrawableSorter::iterator;
 
     sf::RenderWindow* window;
 
-    Window(Logger* l, string name = "Window-Worker") : Parent(l, name) {}
+    Window(Logger* l, string name = "Window-Worker") : Parent(l, name), pool(l, DrawableSorter::List()) {}
 
     void Main() override {
         window = new sf::RenderWindow{ sf::VideoMode(x, y), NAME, sf::Style::Close | sf::Style::Titlebar };
@@ -67,7 +68,7 @@ public:
             }
             window->clear();
             for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
-                window->draw(*(*iter).second);
+                window->draw(*(*iter)->drawable);
             }
             window->display();
         }
@@ -76,28 +77,23 @@ public:
 
         Exit();
     }
-    
-    poolIter* SendDrawable(Parent* elem, sf::Drawable* sp) {
-        pool.insert(pair(elem, sp));
-        poolIter iter = pool.end();
-        return &iter;
+
+    size_t SendDrawablePos(Drawable* d) {
+        pool += d;
+        return pool.last();
     }
 
-    size_t SendDrawablePos(Parent* elem, sf::Drawable* sp) {
-        pool.insert(pair(elem, sp));
-        return pool.size() - 1;
+    size_t SendDrawablePos(Parent* p, sf::Drawable* d, size_t l) {
+        pool += new Drawable(p, d ,l);
+        return pool.last();
     }
 
     void RemoveBeginDrawable() {
-        pool.erase(pool.begin());
+        pool-=0;
     }
 
     void RemoveEndDrawable() {
-        pool.erase(pool.end());
-    }
-
-    void RemoveDrawable(poolIter* iter) {
-        pool.erase(*iter);
+        pool--;
     }
 
     void RemoveDrawable(size_t pos) {
@@ -105,8 +101,11 @@ public:
         size_t i = 0;
         for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
             if (i == pos) {
-                pool.erase(iter);
+                pool -= iter;
                 return;
+            }
+            else {
+                iter++;
             }
             i++;
         }
@@ -114,8 +113,11 @@ public:
 
     void Cleanup(Parent* elem) {
         for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
-            if ((*iter).first == elem) {
-                pool.erase(iter);
+            if ((*iter)->elem == elem) {
+                pool -= iter;
+            }
+            else {
+                iter++;
             }
         }
     }

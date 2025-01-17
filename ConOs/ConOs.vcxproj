@@ -126,8 +126,10 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <SetChecksum>true</SetChecksum>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -141,10 +143,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="OS.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -45,10 +45,11 @@ void Logger::LoggerWorker()
 	while (this->work) {
 		//if (USE_ASSERT) { cout << to_string(this->threads.size()) + " " + to_string(this->pool.size()) + "\n"; }
 		this->started = true;
-		for (poolIter iter = this->pool.begin(); iter != this->pool.end(); iter++) {
+		vector<string> pool_ = this->pool;
+		this->pool.clear();
+		for (poolIter iter = pool_.begin(); iter != pool_.end(); iter++) {
 			cout << (*iter + "\n").c_str();
 		}
-		this->pool.clear();
 		this_thread::sleep_for(chrono::milliseconds(10));
 		if (this->stop) { this->work = false; }
 		if (this->started && this->threads.empty()) { this->stop = true; }

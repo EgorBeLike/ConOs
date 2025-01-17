@@ -43,6 +43,6 @@ namespace fs = std::filesystem;
 #pragma comment(lib, "sfml-system.lib")
 #pragma comment(lib, "sfml-window.lib")
 
-#define NAME "ConOS"
+#include "resource.h"
 
 using namespace std;

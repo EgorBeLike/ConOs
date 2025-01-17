@@ -44,7 +44,7 @@ namespace Constants {
 }
 
 struct Disk {
-    using fileState = _Iosb<int>;
+    using fileState = ios_base::iostate;
     string fspath;
     fstream str;
     void Load(string path) {
@@ -61,6 +61,7 @@ struct Disk {
         for (size_t i = 0; i < block - mess.size(); i++) {
             str.write("\0", 1);
         }
+        return str.rdstate();
     }
 };
 

@@ -28,7 +28,8 @@ public:
 
         fs::path logoPath = getABSPath("data\\images\\logo.png");
 
-        if (!fs::exists(logoPath)) { logger->SendSignal(fsystem, ERR, logoPath.string() + " not found!"); }
+        if (!fs::exists(logoPath)) { logger->SendSignal(fsystem, FATAL, logoPath.string() + " not found! Check all system data and restart."); }
+        logger->SendSignal(fsystem, INFO, "Load " + logoPath.string() + "...");
 
         logoImage.loadFromFile(logoPath.string());
         logoImage.saveToFile(getABSPath("cache\\logo.png"));
@@ -42,7 +43,9 @@ public:
         logoSprite.setScale(sf::Vector2f(2, 2));
         logoSprite.setPosition(sf::Vector2f(window->x / 2 - 32*2, window->y / 2 - 16*2 - 50));
 
-        size_t logoPoolIter = window->SendDrawablePos(this, &logoSprite);
+        logger->SendSignal(fsystem, INFO, "Draw " + logoPath.string() + "...");
+
+        size_t logoPoolIter = window->SendDrawablePos(this, &logoSprite, 0);
         this_thread::sleep_for(chrono::milliseconds(3000));
         window->RemoveDrawable(logoPoolIter);
 
@@ -54,7 +57,8 @@ public:
             sf::Text title{ "ConOS CONFIG MENU", font};
             title.setCharacterSize(32);
             title.setPosition(sf::Vector2f(20, 20));
-            size_t titleIter = window->SendDrawablePos(this, &title);
+            size_t titleIter = window->SendDrawablePos(this, &title, 0);
+            logger->SendSignal(fsystem, INFO, "Wait user's request...");
             this_thread::sleep_for(chrono::milliseconds(3000));
         }
         window->Cleanup(this);
