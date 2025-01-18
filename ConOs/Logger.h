@@ -1,19 +1,8 @@
 #pragma once
+#ifndef CONOS_LOGGER
+#define CONOS_LOGGER 1
+
 #include "Define.h"
-
-enum LoggerMessageLevel {
-	DEBUG = -1,
-	INFO,
-	WARN,
-	ERR,
-	FATAL,
-	STARTED,
-	STOPPED
-};
-
-string EnumToStr(LoggerMessageLevel);
-
-class Logger;
 
 class Parent {
 public:
@@ -23,7 +12,7 @@ public:
 	string name = "Worker";
 	virtual void Main() {}
 	Parent(Logger*, string = "Worker");
-	constexpr inline string getName() { return name; }
+	constexpr inline string getName() const { return name; }
 	void Exit();
 	virtual void Destroy() {}
 	virtual ~Parent() {}
@@ -44,3 +33,5 @@ public:
 	void SendSignal(Parent*, LoggerMessageLevel, string);
 	void SendSignal(string, LoggerMessageLevel, string);
 };
+
+#endif
