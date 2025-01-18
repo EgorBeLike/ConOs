@@ -1,12 +1,17 @@
 #pragma once
+#ifndef CONOS_UTIL
+#define CONOS_UTIL 1
+
 #include "Define.h"
 
-enum OSStatus {
-    STARTED,
-    CHECK,
-    OK,
-    CONFIG,
-    FATALSCREEN
+struct OSStatus {
+    enum {
+        STARTED,
+        CHECK,
+        OK,
+        CONFIG,
+        FATALSCREEN
+    };
 };
 
 enum ConcfgLoadStatus {
@@ -15,6 +20,38 @@ enum ConcfgLoadStatus {
     RdErr,
     WrErr
 };
+
+enum LoggerMessageLevel {
+    DEBUG = -1,
+    INFO,
+    WARN,
+    ERR,
+    FATAL,
+    STARTED,
+    STOPPED
+};
+
+string LoggerEnumToStr(LoggerMessageLevel level) {
+    switch (level)
+    {
+    case DEBUG:
+        return "DEBUG";
+    case INFO:
+        return "INFO";
+    case WARN:
+        return "WARN";
+    case ERR:
+        return "ERROR";
+    case FATAL:
+        return "FATAL";
+    case STARTED:
+        return "START-INFO";
+    case STOPPED:
+        return "STOP-INFO";
+    default:
+        return "UNKNOWN";
+    }
+}
 
 using message = vector<char>;
 
@@ -46,7 +83,7 @@ message StringToMessage(string str) {
 *  3 | UseReserved       | Bool   | 1 B                       | 26 B                               | Enable Reserved block (Always 0)
 *  4 | FSSize            | ULL    | 20 B                      | 46 B                               | Filesystem size in bytes
 *  5 | OSFiles           | FB     | 1073741824 B (1 GB)       | 1073741870 B (1 GB)                | OS files structure. Read-Only files
-*  6 | Reserved          | MB     | 1073741824 B (1 GB)       | 2147483694 B (2 GB)                | Reserved. In future for OS Pause
+*  6 | Reserved          | MB     | 1073741824 B (1 GB)       | 2147483694 B (2 GB)                | Reserved. In future, to OS suspend
 *  7 | FS                | FB     | <35184372088832 B (32 TB) | <35186519572526 B (32770 GB/32 TB) | Disk File System
 * 
 *  FB Data Structure:
@@ -71,7 +108,7 @@ message StringToMessage(string str) {
 namespace Constants {
     const message FSFileTypeMessage = StringToMessage("ConOSFileSystem");
     const size_t  FSFileTypeOffset = 0;
-    const size_t  FSFileTypeSize = FSFileTypeMessage.size();
+    const size_t  FSFileTypeSize = 15;
     const size_t  FSFileVerOffset = FSFileTypeOffset + FSFileTypeSize;
     const size_t  FSFileVerSize = 10;
     const size_t  UseReservedOffset = FSFileVerOffset + FSFileVerSize;
@@ -86,20 +123,34 @@ namespace Constants {
     const size_t  FSSize = 35184372088832;
 }
 
+
+/* Concfg Structure:
+*  # | Name                  | Type   | Size                      | Total Size                         | Comment
+*  --+-----------------------+--------+---------------------------+------------------------------------+-------------------------------------
+*  1 | ConcfgFileTypeMessage | String | 8 B                       | 8 B                                | File type constant for check
+*  2 | ConcfgFileVer         | UInt   | 10 B                      | 18 B                               | File version for know missing blocks
+*  3 | LoadOsPath            | String | 255 B                     | 273 B                              | Path to disk for load OS
+*/
 namespace Constants {
-    const LPSTR   ConcfgFileType = ".concfg";
     const message ConcfgFileTypeMessage = StringToMessage("ConOSCfg");
     const size_t  ConcfgFileTypeOffset = 0;
-    const size_t  ConcfgFileTypeSize = ConcfgFileTypeMessage.size();
+    const size_t  ConcfgFileTypeSize = 8;
     const size_t  ConcfgFileVerOffset = ConcfgFileTypeOffset + ConcfgFileTypeSize;
     const size_t  ConcfgFileVerSize = 10;
+    const size_t  LoadOsPathOffset = ConcfgFileVerOffset + ConcfgFileVerSize;
+    const size_t  LoadOsPathSize = 255;
 }
 
-class Parent;
-class Logger;
-class Window;
-class FileSystem;
-class OS;
+class  Parent;
+class  Logger;
+struct KeyBoardMouse;
 struct Drawable;
-class DrawableSorter;
-class DrawableSorter::iterator;
+class  DrawableSorter;
+class  DrawableSorter::iterator;
+class  Window;
+struct Disk;
+struct Config;
+class  FileSystem;
+class  OS;
+
+#endif

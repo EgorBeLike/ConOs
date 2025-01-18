@@ -6,7 +6,8 @@
 
 int main()
 {
-    cout << string(NAME) + " v1.0\n";
+    SetConsoleTitleA((string(NAME) + " v" + VER).c_str());
+    cout << string(NAME) + " v" + VER + "\n";
     Logger* logger = new Logger();
     Window* window = new Window(logger);
     FileSystem* filesys = new FileSystem(logger);

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CONOS_DEFINE
+#define CONOS_DEFINE 1
+
 #include <iostream>
 #include <SFML/Main.hpp>
 #include <SFML/System.hpp>
@@ -11,10 +14,10 @@
 #include <chrono>
 #include <condition_variable>
 #include <vector>
-#include <string.h>
 #include <Windows.h>
 #include <fstream>
 #include <map>
+#include <commdlg.h>
 
 #define USE_ASSERT true
 
@@ -47,3 +50,5 @@ namespace fs = std::filesystem;
 #include "Util.h"
 
 using namespace std;
+
+#endif

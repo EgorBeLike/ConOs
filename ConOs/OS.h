@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CONOS_OS
+#define CONOS_OS 1
+
 #include "Define.h"
 #include "Logger.h"
 #include "Window.h"
@@ -11,7 +14,7 @@ public:
     FileSystem* fsystem;
     Config* config;
 
-    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(OSStatus::STARTED), window(w), fsystem(f) { fsystem->config = &config; }
+    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(OSStatus::STARTED), window(w), fsystem(f) { config = fsystem->getCfg(); }
 
     bool isConfigLoaded(){}
 
@@ -58,3 +61,5 @@ public:
         Exit();
     }
 };
+
+#endif

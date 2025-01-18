@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CONOS_WINDOW
+#define CONOS_WINDOW 1
+
 #include "Define.h"
 #include "Logger.h"
 #include "Drawable.h"
@@ -131,3 +134,4 @@ public:
     }
 };
 
+#endif

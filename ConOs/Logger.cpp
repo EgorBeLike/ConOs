@@ -1,30 +1,6 @@
 #include "Define.h"
 #include "Logger.h"
 
-
-
-string EnumToStr(LoggerMessageLevel level) {
-	switch (level)
-	{
-	case DEBUG:
-		return "DEBUG";
-	case INFO:
-		return "INFO";
-	case WARN:
-		return "WARN";
-	case ERR:
-		return "ERROR";
-	case FATAL:
-		return "FATAL";
-	case STARTED:
-		return "START-INFO";
-	case STOPPED:
-		return "STOP-INFO";
-	default:
-		return "UNKNOWN";
-	}
-}
-
 Parent::Parent(Logger* l, string name) {
 	this->name = name;
 	this->logger = l;
@@ -74,9 +50,9 @@ void Logger::RemoveThread(Parent* elem) {
 	}
 }
 void Logger::SendSignal(string name, LoggerMessageLevel level, string message) {
-	this->pool.push_back("[" + EnumToStr(level) + "] [" + name + "] " + message);
+	this->pool.push_back("[" + LoggerEnumToStr(level) + "] [" + name + "] " + message);
 	if (level == STARTED || level == STOPPED) {
-		throw exception((EnumToStr(level) + " not supported").c_str());
+		throw exception((LoggerEnumToStr(level) + " not supported").c_str());
 	}
 	if (level == FATAL) {
 		for (auto& thrd : this->threads) {
@@ -85,7 +61,7 @@ void Logger::SendSignal(string name, LoggerMessageLevel level, string message) {
 	}
 }
 void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) {
-	this->pool.push_back("[" + EnumToStr(level) + "] [" + elem->getName() + "] " + message);
+	this->pool.push_back("[" + LoggerEnumToStr(level) + "] [" + elem->getName() + "] " + message);
 	if (level == STARTED) {
 		this->threads.push_back(elem);
 	}

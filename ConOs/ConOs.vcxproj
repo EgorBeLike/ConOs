@@ -136,7 +136,6 @@
     <ClCompile Include="ConOs.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Logger.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CONOS_DRAWABLE
+#define CONOS_DRAWABLE 1
+
 #include "Define.h"
 #include "Logger.h"
 
@@ -186,3 +189,5 @@ public:
         Exit();
     }
 };
+
+#endif

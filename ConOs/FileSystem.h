@@ -1,7 +1,11 @@
 #pragma once
+#ifndef CONOS_FILESYSTEM
+#define CONOS_FILESYSTEM 1
+
 #include "Define.h"
 #include "Logger.h"
 #include "Window.h"
+#include "OS.h"
 
 struct Disk {
     using fileState = ios_base::iostate;
@@ -40,7 +44,7 @@ struct Config {
     Config(Logger* l) : logger(l) {}
 
     ConcfgLoadStatus ReadAll() {
-        if(configDisk.fspath.ends_with(Constants::ConcfgFileType))
+        
     }
 
     ConcfgLoadStatus Write() {
@@ -49,11 +53,34 @@ struct Config {
 };
 
 class FileSystem : public Parent {
-public:
+protected:
     Disk mainDisk;
     Config config;
+public:
     bool configLoaded = false;
-    FileSystem(Logger* l, string name = "FileSystem-Worker");
-    void CreateNewFS();
-    void Main() override;
+    FileSystem(Logger* l, string name = "FileSystem-Worker") : Parent(l, name) {
+        if (!fs::exists(getABSPath("fs\\"))) {
+            logger->SendSignal(this, ERR, "File Systems folder not found... Preparing new FS...");
+        }
+    }
+    void CreateNewFS(string path) {
+        
+    }
+    void Main() override {
+        this->logger->SendSignal(this, INFO, "Waiting for load config...");
+        while (!this->config.isLoaded) {
+            if (!this->work) {
+                Exit();
+                return;
+            }
+            this_thread::sleep_for(chrono::milliseconds(10));
+        }
+        this->logger->SendSignal(this, INFO, "Config founded!");
+        this->mainDisk.Load(this->config.loadOSPath);
+        Exit();
+    }
+    Config* getCfg() { return &config; }
+    Disk* getMainDisk() { return &mainDisk; }
 };
+
+#endif
