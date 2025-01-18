@@ -2,8 +2,6 @@
 #include "Define.h"
 #include "Logger.h"
 
-class DrawableSorter;
-
 struct Drawable {
     Parent* elem;
     sf::Drawable* drawable;

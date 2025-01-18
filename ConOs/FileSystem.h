@@ -3,46 +3,6 @@
 #include "Logger.h"
 #include "Window.h"
 
-static inline string getABSPath(const char* path = "") {
-    vector<char> pathBuf;
-    DWORD copied = 0;
-    do {
-        pathBuf.resize(pathBuf.size() + MAX_PATH);
-        copied = GetModuleFileNameA(nullptr, &pathBuf.at(0), pathBuf.size());
-    } while (copied >= pathBuf.size());
-    pathBuf.resize(copied);
-    string path_(pathBuf.begin(), pathBuf.end());
-    return fs::path(path_).parent_path().string() + "\\" + string(path);
-}
-
-using message = vector<char>;
-
-static message StringToMessage(string str) {
-    message mess;
-    for (auto& ch : str) {
-        mess.push_back(ch);
-    }
-    return mess;
-}
-
-namespace Constants {
-    const message FSFileTypeMessage = StringToMessage("ConOSFileSystem");
-    const size_t  FSFileTypeOffset = 0;
-    const size_t  FSFileTypeSize = FSFileTypeMessage.size();
-    const size_t  FSFileVerOffset = FSFileTypeOffset + FSFileTypeSize;
-    const size_t  FSFileVerSize = 10;
-    const size_t  UseReservedOffset = FSFileVerOffset + FSFileVerSize;
-    const size_t  UseReservedSize = 1;
-    const size_t  FSSizeOffset = UseReservedOffset + UseReservedSize;
-    const size_t  FSSizeSize = 20;
-    const size_t  OSFilesOffset = FSSizeOffset + FSSizeSize;
-    const size_t  OSFilesSize = 1073741824;
-    const size_t  ReservedOffset = OSFilesOffset + OSFilesSize;
-    const size_t  ReservedSize = 1073741824;
-    const size_t  FSOffset = ReservedOffset + ReservedSize;
-    const size_t  FSSize = 35184372088832;
-}
-
 struct Disk {
     using fileState = ios_base::iostate;
     string fspath;
@@ -65,18 +25,25 @@ struct Disk {
     }
 };
 
-namespace Constants {
-
-}
-
 struct Config {
     string loadOSPath;
     Disk configDisk;
+    Logger* logger;
+    ConcfgLoadStatus stat = OK;
     bool isLoaded = false;
-    void Read(string path) {
-
+    ConcfgLoadStatus Load(string path) {
+        configDisk = Disk(path);
+        if ((stat = ReadAll()) != OK) { return stat; }
     }
-    void Write(string path) {
+
+    Config(Logger* l, string path) : logger(l) { Load(path); }
+    Config(Logger* l) : logger(l) {}
+
+    ConcfgLoadStatus ReadAll() {
+        if(configDisk.fspath.ends_with(Constants::ConcfgFileType))
+    }
+
+    ConcfgLoadStatus Write() {
 
     }
 };
@@ -84,7 +51,7 @@ struct Config {
 class FileSystem : public Parent {
 public:
     Disk mainDisk;
-    Config* config;
+    Config config;
     bool configLoaded = false;
     FileSystem(Logger* l, string name = "FileSystem-Worker");
     void CreateNewFS();

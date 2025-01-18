@@ -12,7 +12,7 @@ void FileSystem::CreateNewFS() {
 
 void FileSystem::Main() {
     this->logger->SendSignal(this, INFO, "Waiting for load config...");
-    while (!this->config->isLoaded) {
+    while (!this->config.isLoaded) {
         if (!this->work) {
             Exit();
             return;
@@ -20,6 +20,6 @@ void FileSystem::Main() {
         this_thread::sleep_for(chrono::milliseconds(10));
     }
     this->logger->SendSignal(this, INFO, "Config founded!");
-    this->mainDisk.Load(this->config->loadOSPath);
+    this->mainDisk.Load(this->config.loadOSPath);
     Exit();
 }

@@ -148,6 +148,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="OS.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

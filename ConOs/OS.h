@@ -6,20 +6,12 @@
 
 class OS : public Parent {
 public:
-    enum OSStatus {
-        STARTED,
-        CHECK,
-        OK,
-        CONFIG,
-        FATALSCREEN
-    };
-
     OSStatus stat;
     Window* window;
     FileSystem* fsystem;
-    Config config;
+    Config* config;
 
-    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(STARTED), window(w), fsystem(f) { fsystem->config = &config; }
+    OS(Logger* l, Window* w, FileSystem* f, string name = "OS-Worker") : Parent(l, name), stat(OSStatus::STARTED), window(w), fsystem(f) { fsystem->config = &config; }
 
     bool isConfigLoaded(){}
 
@@ -49,8 +41,8 @@ public:
         this_thread::sleep_for(chrono::milliseconds(3000));
         window->RemoveDrawable(logoPoolIter);
 
-        if (!fs::exists(config.loadOSPath)) {
-            logger->SendSignal(fsystem, ERR, config.loadOSPath + " not found! Set OS status: CONFIG");
+        if (!fs::exists(config->loadOSPath)) {
+            logger->SendSignal(fsystem, ERR, config->loadOSPath + " not found! Set OS status: CONFIG");
             sf::Font font{};
             font.loadFromFile(getABSPath("data\\fonts\\config.ttf"));
             font.getTexture(32).copyToImage().saveToFile(getABSPath("cache\\config.ttf.png"));
