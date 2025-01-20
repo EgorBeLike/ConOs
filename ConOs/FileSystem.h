@@ -27,6 +27,14 @@ struct Disk {
         }
         return str.rdstate();
     }
+	fileState Write(size_t offset, message* mess, size_t block) {
+		message tmp;
+		tmp.resize(block);
+        str.seekg(offset);
+        str.read(&tmp[0], block);
+		mess = &tmp;
+        return str.rdstate();
+    }
 };
 
 struct Config {

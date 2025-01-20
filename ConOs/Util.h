@@ -4,6 +4,9 @@
 
 #include "Define.h"
 
+/* Значения OSStatus:
+*   - STARTED - Флаг запуска и загрузки конфигурации
+*/
 struct OSStatus {
     enum Values {
         STARTED,
@@ -79,35 +82,37 @@ inline message StringToMessage(string str) {
     return mess;
 }
 
-/* FileSystem Structure:
-*  # | Name              | Type   | Size                      | Total Size                         | Comment
-*  --+-------------------+--------+---------------------------+------------------------------------+-------------------------------------
-*  1 | FSFileTypeMessage | String | 15 B                      | 15 B                               | File type constant for check
-*  2 | FSFileVer         | UInt   | 10 B                      | 25 B                               | File version for know missing blocks
-*  3 | UseReserved       | Bool   | 1 B                       | 26 B                               | Enable Reserved block (Always 0)
-*  4 | FSSize            | ULL    | 20 B                      | 46 B                               | Filesystem size in bytes
-*  5 | OSFiles           | FB     | 1073741824 B (1 GB)       | 1073741870 B (1 GB)                | OS files structure. Read-Only files
-*  6 | Reserved          | MB     | 1073741824 B (1 GB)       | 2147483694 B (2 GB)                | Reserved. In future, to OS suspend
-*  7 | FS                | FB     | <35184372088832 B (32 TB) | <35186519572526 B (32770 GB/32 TB) | Disk File System
+inline string MessageToString(message mess) {
+    string str;
+    for (auto& ch : mess) {
+        str+=ch;
+    }
+    return str;
+}
+
+/* Структура .confs:
+*  # | Название          | Тип    | Размер                    | Общий размер                       | Описание
+*  --+-------------------+--------+---------------------------+------------------------------------+------------------------------------------------------------------
+*  1 | FSFileTypeMessage | String | 15 Б                      | 15 Б                               | Константа для проверки типа файла
+*  2 | FSFileVer         | UInt   | 10 Б                      | 25 Б                               | Версия файла для расчета блоков
+*  3 | UseReserved       | Bool   | 1 Б                       | 26 Б                               | Флаг переключения использования резервного блока (Всегда 0)
+*  4 | FSSize            | ULL    | 20 Б                      | 46 Б                               | Размер Файловой Системы в байта (Макс. значение - 35184372088832)
+*  5 | OSFiles           | FS     | 1073741824 Б (1 ГБ)       | 1073741870 Б (1 ГБ)                | Системные файлы (Запись только на уровне ядра)
+*  6 | Reserved          | MS     | 1073741824 Б (1 ГБ)       | 2147483694 Б (2 ГБ)                | Зарезервированный блок.
+*  7 | FS                | FS     | <35184372088832 Б (32 ТБ) | <35186519572526 Б (32770 ГБ/32 ТБ) | Файловая система
 * 
-*  FB Data Structure:
-*  1              2    3 4
-*  v              v    v v
-*  --------------|----|-|---------------------------------
+*  Структура FS:
+*  # | Название | Тип    | Размер                         | Общий размер              | Описание
+*  --+----------+--------+--------------------------------+---------------------------+----------------------------------------
+*  1 | FileName | String | 1024 Б (1 КБ)                  | 1024 Б (1 КБ)             | Имя файла
+*  2 | Size     | ULL    | 20 Б                           | 1044 Б (1 КБ)             | Размер файла
+*  3 | Flags    | Short  | 1 Б                            | 1045 Б (1 КБ)             | Флаги файла (например, "только чтение")
+*  4 | FileData | String | <35184372087787 Б (32767,9 ГБ) | <35184372088832 Б (32 ГБ) | Данные файла
 * 
-*  FB Structure:
-*  # | Name     | Type   | Size                           | Total Size                | Comment
-*  --+----------+--------+--------------------------------+---------------------------+-------------------------------------
-*  1 | FileName | String | 1024 B (1 KB)                  | 1024 B (1 KB)             | File name
-*  2 | Size     | ULL    | 20 B                           | 1044 B (1 KB)             | File data size
-*  3 | Flags    | Shrt   | 1 B                            | 1045 B (1 KB)             | File flags (read file documentation)
-*  4 | FileData | String | <35184372087787 B (32767,9 GB) | <35184372088832 B (32 TB) | File data
-* 
-*  Shrt - short
 *  UInt - unsigned int       (DWORD)
 *  ULL  - unsigned long long (size_t)
-*  FB   - Files Base
-*  MB   - Memory Base
+*  FS   - Файловая Система
+*  MS   - Система Данных
 */
 namespace Constants {
     const message FSFileTypeMessage = StringToMessage("ConOSFileSystem");
@@ -128,7 +133,7 @@ namespace Constants {
 }
 
 
-/* Concfg Structure:
+/* Структура .concfg:
 *  # | Name                  | Type   | Size                      | Total Size                         | Comment
 *  --+-----------------------+--------+---------------------------+------------------------------------+-------------------------------------
 *  1 | ConcfgFileTypeMessage | String | 8 B                       | 8 B                                | File type constant for check
