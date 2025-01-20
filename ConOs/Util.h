@@ -5,7 +5,7 @@
 #include "Define.h"
 
 struct OSStatus {
-    enum {
+    enum Values {
         STARTED,
         CHECK,
         OK,
@@ -14,39 +14,43 @@ struct OSStatus {
     };
 };
 
-enum ConcfgLoadStatus {
-    OK,
-    InvalidType,
-    RdErr,
-    WrErr
+struct ConcfgLoadStatus {
+    enum Values {
+        OK,
+        InvalidType,
+        RdErr,
+        WrErr
+    };
 };
 
-enum LoggerMessageLevel {
-    DEBUG = -1,
-    INFO,
-    WARN,
-    ERR,
-    FATAL,
-    STARTED,
-    STOPPED
+struct LoggerMessageLevel {
+    enum Values {
+        DEBUG = -1,
+        INFO,
+        WARN,
+        ERR,
+        FATAL,
+        STARTED,
+        STOPPED
+    };
 };
 
-string LoggerEnumToStr(LoggerMessageLevel level) {
+inline string LoggerEnumToStr(LoggerMessageLevel::Values level) {
     switch (level)
     {
-    case DEBUG:
+    case LoggerMessageLevel::DEBUG:
         return "DEBUG";
-    case INFO:
+    case LoggerMessageLevel::INFO:
         return "INFO";
-    case WARN:
+    case LoggerMessageLevel::WARN:
         return "WARN";
-    case ERR:
+    case LoggerMessageLevel::ERR:
         return "ERROR";
-    case FATAL:
+    case LoggerMessageLevel::FATAL:
         return "FATAL";
-    case STARTED:
+    case LoggerMessageLevel::STARTED:
         return "START-INFO";
-    case STOPPED:
+    case LoggerMessageLevel::STOPPED:
         return "STOP-INFO";
     default:
         return "UNKNOWN";
@@ -55,7 +59,7 @@ string LoggerEnumToStr(LoggerMessageLevel level) {
 
 using message = vector<char>;
 
-string getABSPath(const char* path = "") {
+inline string getABSPath(const char* path = "") {
     vector<char> pathBuf;
     DWORD copied = 0;
     do {
@@ -67,7 +71,7 @@ string getABSPath(const char* path = "") {
     return fs::path(path_).parent_path().string() + "\\" + string(path);
 }
 
-message StringToMessage(string str) {
+inline message StringToMessage(string str) {
     message mess;
     for (auto& ch : str) {
         mess.push_back(ch);
@@ -143,13 +147,8 @@ namespace Constants {
 
 class  Parent;
 class  Logger;
-struct KeyBoardMouse;
-struct Drawable;
 class  DrawableSorter;
-class  DrawableSorter::iterator;
 class  Window;
-struct Disk;
-struct Config;
 class  FileSystem;
 class  OS;
 

@@ -3,6 +3,7 @@
 #define CONOS_LOGGER 1
 
 #include "Define.h"
+#include "Util.h"
 
 class Parent {
 public:
@@ -30,8 +31,8 @@ public:
 	Logger(bool isDebug = false) : work(true), started(false), stop(false) {}
 	void LoggerWorker();
 	void RemoveThread(Parent*);
-	void SendSignal(Parent*, LoggerMessageLevel, string);
-	void SendSignal(string, LoggerMessageLevel, string);
+	void SendSignal(Parent*, LoggerMessageLevel::Values, string);
+	void SendSignal(string, LoggerMessageLevel::Values, string);
 };
 
 #endif

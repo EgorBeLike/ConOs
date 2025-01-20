@@ -1,4 +1,5 @@
 ﻿#include "Define.h"
+#include "Util.h"
 #include "Window.h"
 #include "Logger.h"
 #include "FileSystem.h"

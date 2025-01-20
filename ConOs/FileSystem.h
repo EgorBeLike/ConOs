@@ -3,9 +3,9 @@
 #define CONOS_FILESYSTEM 1
 
 #include "Define.h"
+#include "Util.h"
 #include "Logger.h"
 #include "Window.h"
-#include "OS.h"
 
 struct Disk {
     using fileState = ios_base::iostate;
@@ -33,21 +33,21 @@ struct Config {
     string loadOSPath;
     Disk configDisk;
     Logger* logger;
-    ConcfgLoadStatus stat = OK;
+    ConcfgLoadStatus::Values stat = ConcfgLoadStatus::OK;
     bool isLoaded = false;
-    ConcfgLoadStatus Load(string path) {
+    ConcfgLoadStatus::Values Load(string path) {
         configDisk = Disk(path);
-        if ((stat = ReadAll()) != OK) { return stat; }
+        if ((stat = ReadAll()) != ConcfgLoadStatus::OK) { return stat; }
     }
 
     Config(Logger* l, string path) : logger(l) { Load(path); }
     Config(Logger* l) : logger(l) {}
 
-    ConcfgLoadStatus ReadAll() {
+    ConcfgLoadStatus::Values ReadAll() {
         
     }
 
-    ConcfgLoadStatus Write() {
+    ConcfgLoadStatus::Values Write() {
 
     }
 };
@@ -58,16 +58,16 @@ protected:
     Config config;
 public:
     bool configLoaded = false;
-    FileSystem(Logger* l, string name = "FileSystem-Worker") : Parent(l, name) {
+    FileSystem(Logger* l, string name = "FileSystem-Worker") : Parent(l, name), config(l) {
         if (!fs::exists(getABSPath("fs\\"))) {
-            logger->SendSignal(this, ERR, "File Systems folder not found... Preparing new FS...");
+            logger->SendSignal(this, LoggerMessageLevel::ERR, "File Systems folder not found... Preparing new FS...");
         }
     }
     void CreateNewFS(string path) {
         
     }
     void Main() override {
-        this->logger->SendSignal(this, INFO, "Waiting for load config...");
+        this->logger->SendSignal(this, LoggerMessageLevel::INFO, "Waiting for load config...");
         while (!this->config.isLoaded) {
             if (!this->work) {
                 Exit();
@@ -75,7 +75,7 @@ public:
             }
             this_thread::sleep_for(chrono::milliseconds(10));
         }
-        this->logger->SendSignal(this, INFO, "Config founded!");
+        this->logger->SendSignal(this, LoggerMessageLevel::INFO, "Config founded!");
         this->mainDisk.Load(this->config.loadOSPath);
         Exit();
     }

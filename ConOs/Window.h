@@ -3,6 +3,7 @@
 #define CONOS_WINDOW 1
 
 #include "Define.h"
+#include "Util.h"
 #include "Logger.h"
 #include "Drawable.h"
 
@@ -38,10 +39,10 @@ public:
     void Main() override {
         window = new sf::RenderWindow{ sf::VideoMode(x, y), NAME, sf::Style::Close | sf::Style::Titlebar };
         if (window->isOpen()) {
-            logger->SendSignal(this, INFO, "Window is created!");
+            logger->SendSignal(this, LoggerMessageLevel::INFO, "Window is created!");
         }
         else {
-            logger->SendSignal(this, FATAL, "Window isn't created!");
+            logger->SendSignal(this, LoggerMessageLevel::FATAL, "Window isn't created!");
         }
         
         while (window->isOpen() && work)
@@ -66,7 +67,7 @@ public:
                 if (kbm.type == sf::Event::Closed)
                 {
                     Destroy();
-                    logger->SendSignal(this, FATAL, "Window is closed!");
+                    logger->SendSignal(this, LoggerMessageLevel::FATAL, "Window is closed!");
                 }
             }
             window->clear();
@@ -100,7 +101,7 @@ public:
     }
 
     void RemoveDrawable(size_t pos) {
-        if (pos >= pool.size()) { logger->SendSignal(this, ERR, "RemoveDrawable: Position is invalid!"); }
+        if (pos >= pool.size()) { logger->SendSignal(this, LoggerMessageLevel::ERR, "RemoveDrawable: Position is invalid!"); }
         size_t i = 0;
         for (poolIter iter = pool.begin(); iter != pool.end(); iter++) {
             if (i == pos) {

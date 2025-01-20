@@ -47,7 +47,6 @@ namespace fs = std::filesystem;
 #pragma comment(lib, "sfml-window.lib")
 
 #include "resource.h"
-#include "Util.h"
 
 using namespace std;
 

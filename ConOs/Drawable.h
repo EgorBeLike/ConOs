@@ -3,6 +3,7 @@
 #define CONOS_DRAWABLE 1
 
 #include "Define.h"
+#include "Util.h"
 #include "Logger.h"
 
 struct Drawable {
@@ -84,7 +85,7 @@ public:
         iterator& setPos(size_t p) {
             size_t _p = getSafePos(p);
             if (_p != p) {
-                parent->logger->SendSignal(parent, ERR, "iterator.operator+=: arg \"p\" isn't valid. Setted valid pos");
+                parent->logger->SendSignal(parent, LoggerMessageLevel::ERR, "iterator.operator+=: arg \"p\" isn't valid. Setted valid pos");
                 p = _p;
             }
             pos = p;

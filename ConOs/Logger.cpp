@@ -1,17 +1,18 @@
 #include "Define.h"
+#include "Util.h"
 #include "Logger.h"
 
 Parent::Parent(Logger* l, string name) {
 	this->name = name;
 	this->logger = l;
 	this->work = true;
-	this->logger->SendSignal(this, STARTED, "Starting...");
+	this->logger->SendSignal(this, LoggerMessageLevel::STARTED, "Starting...");
 	this->functhread = new thread(&Parent::Main, this);
 	this->functhread->detach();
 }
 void Parent::Exit() {
 	this->work = false;
-	this->logger->SendSignal(this, STOPPED, "Stopped!");
+	this->logger->SendSignal(this, LoggerMessageLevel::STOPPED, "Stopped!");
 }
 
 void Logger::LoggerWorker()
@@ -49,26 +50,26 @@ void Logger::RemoveThread(Parent* elem) {
 		}
 	}
 }
-void Logger::SendSignal(string name, LoggerMessageLevel level, string message) {
+void Logger::SendSignal(string name, LoggerMessageLevel::Values level, string message) {
 	this->pool.push_back("[" + LoggerEnumToStr(level) + "] [" + name + "] " + message);
-	if (level == STARTED || level == STOPPED) {
+	if (level == LoggerMessageLevel::STARTED || level == LoggerMessageLevel::STOPPED) {
 		throw exception((LoggerEnumToStr(level) + " not supported").c_str());
 	}
-	if (level == FATAL) {
+	if (level == LoggerMessageLevel::FATAL) {
 		for (auto& thrd : this->threads) {
 			thrd->work = false;
 		}
 	}
 }
-void Logger::SendSignal(Parent* elem, LoggerMessageLevel level, string message) {
+void Logger::SendSignal(Parent* elem, LoggerMessageLevel::Values level, string message) {
 	this->pool.push_back("[" + LoggerEnumToStr(level) + "] [" + elem->getName() + "] " + message);
-	if (level == STARTED) {
+	if (level == LoggerMessageLevel::STARTED) {
 		this->threads.push_back(elem);
 	}
-	else if (level == STOPPED) {
+	else if (level == LoggerMessageLevel::STOPPED) {
 		RemoveThread(elem);
 	}
-	else if (level == FATAL) {
+	else if (level == LoggerMessageLevel::FATAL) {
 		for (auto& thrd : this->threads) {
 			thrd->work = false;
 		}
